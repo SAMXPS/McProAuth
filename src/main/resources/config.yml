@@ -1,0 +1,8 @@
+# This is the MySQL configuration section
+mysql:
+  host: "localhost"
+  user: "root"
+  password: ""
+  database: "my_database" 
+# Change the configuration below so you can use website integration
+website: "www.mywebsite.com"
