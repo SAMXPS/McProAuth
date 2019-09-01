@@ -9,7 +9,7 @@ To use McProAuth, you need a BungeeCord server running version 1.8 or above as w
 i.e. The Spigot login server won't be used for anything but receiving your 'offline mode' players and asking them for log-in credentials. 
 
 Configuration Notes: 
-- Your BungeeCord proxy must be configured with ``online_mode: true`` in ``config.yml`` 
+- Your BungeeCord proxy must be configured with ``online_mode: true`` and ``ip_forward: true`` in ``config.yml`` 
 - Your Spigot server must be configured to hook with BungeeCord, it is, ``bungeecord: true`` in ``spigot.yml``
 
 ## Easy. Secure. Effective.
