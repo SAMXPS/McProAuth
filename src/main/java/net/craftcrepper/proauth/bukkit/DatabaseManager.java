@@ -17,19 +17,25 @@ import net.craftcrepper.proauth.bukkit.types.RegistrationRequestToken;
 public class DatabaseManager {
 	
 	private ProAuthBukkit main = ProAuthBukkit.getInstance();
-	private final String prepare = "CREATE TABLE IF NOT EXISTS `users` (   `ID` int(11) NOT NULL AUTO_INCREMENT,   `UUID` varchar(40) NOT NULL,   `NICKNAME` varchar(32) NOT NULL,   `EMAIL` varchar(256) NOT NULL,   `PASSWORD` varchar(256) NOT NULL,   `ONLINE_MODE` tinyint(1) NOT NULL,   `EMAIL_VERIFIED` tinyint(1) NOT NULL DEFAULT '1',   `AUTO_LOGIN` tinyint(1) NOT NULL DEFAULT '0',   PRIMARY KEY (`ID`),   UNIQUE KEY `UUID` (`UUID`),   UNIQUE KEY `ID` (`ID`),   UNIQUE KEY `EMAIL` (`EMAIL`) ) ENGINE=MyISAM AUTO_INCREMENT=10250 DEFAULT CHARSET=latin1;";
+	private final String[] prepare = {
+		"CREATE TABLE IF NOT EXISTS `users` (   `ID` int(11) NOT NULL AUTO_INCREMENT,   `UUID` varchar(40) NOT NULL,   `NICKNAME` varchar(32) NOT NULL,   `EMAIL` varchar(256) NOT NULL,   `PASSWORD` varchar(256) NOT NULL,   `ONLINE_MODE` tinyint(1) NOT NULL,   `EMAIL_VERIFIED` tinyint(1) NOT NULL DEFAULT '1',   `AUTO_LOGIN` tinyint(1) NOT NULL DEFAULT '0',   PRIMARY KEY (`ID`),   UNIQUE KEY `UUID` (`UUID`),   UNIQUE KEY `ID` (`ID`),   UNIQUE KEY `EMAIL` (`EMAIL`) ) ENGINE=MyISAM AUTO_INCREMENT=10250 DEFAULT CHARSET=latin1;",
+		"CREATE TABLE IF NOT EXISTS `recover_request` (   `ID` int(11) NOT NULL AUTO_INCREMENT,   `UUID` varchar(36) NOT NULL,   `USED` tinyint(1) NOT NULL,   `TOKEN` varchar(32) NOT NULL,   `EXPIRE` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,   `IP_ADDRESS` varchar(45) NOT NULL,   `CREATION` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,   PRIMARY KEY (`ID`),   UNIQUE KEY `ID` (`ID`),   UNIQUE KEY `TOKEN` (`TOKEN`) ) ENGINE=InnoDB AUTO_INCREMENT=148 DEFAULT CHARSET=latin1;",
+		"CREATE TABLE IF NOT EXISTS `registration_request` (   `ID` int(11) NOT NULL AUTO_INCREMENT,   `UUID` varchar(36) NOT NULL,   `NICKNAME` varchar(32) NOT NULL,   `TOKEN` varchar(32) NOT NULL,   `EXPIRE` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,   `ONLINE_MODE` tinyint(1) NOT NULL,   PRIMARY KEY (`ID`),   UNIQUE KEY `ID` (`ID`),   UNIQUE KEY `TOKEN` (`TOKEN`) ) ENGINE=MyISAM AUTO_INCREMENT=45912 DEFAULT CHARSET=latin1; ",
+	};
 	
 	public void init() {
-		main.getMysqlManager().executeAsync(prepare, new MysqlCallback<Boolean>() {
-			@Override
-			public void onResult(Boolean paramT, Throwable paramThrowable) {
-				if (paramThrowable != null) {
-					main.getLogger().log(Level.SEVERE, "Can't create database table for users");
-				} else if (paramT) {
-					// Ok, everything went as expected
+		for (String prepare : this.prepare) {
+			main.getMysqlManager().executeAsync(prepare, new MysqlCallback<Boolean>() {
+				@Override
+				public void onResult(Boolean paramT, Throwable paramThrowable) {
+					if (paramThrowable != null) {
+						main.getLogger().log(Level.SEVERE, "Can't create database table");
+					} else if (paramT) {
+						// Ok, everything went as expected
+					}
 				}
-			}
-		});
+			});
+		}
 	}
 
 	public UserData getUserData(Player player){

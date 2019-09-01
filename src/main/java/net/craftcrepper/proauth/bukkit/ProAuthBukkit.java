@@ -77,7 +77,9 @@ public class ProAuthBukkit extends JavaPlugin implements Listener, PluginMessage
 		}
 			
 		this.mysqlManager = new MysqlManager(loadMysqlConfig(), this);
+
 		websiteAddress = getConfig().getString("website", "http://configure.me/");
+		saveConfig();
 		
 		new BukkitRunnable() {
 			
@@ -109,6 +111,7 @@ public class ProAuthBukkit extends JavaPlugin implements Listener, PluginMessage
 		
 		this.passwordVerifier = new PasswordVerifier();
 		this.databaseManager = new DatabaseManager();
+		this.databaseManager.init();
 		
 		Bukkit.getPluginManager().registerEvents(this, instance);
 		Bukkit.getPluginManager().registerEvents(new AuthCommand(), instance);
