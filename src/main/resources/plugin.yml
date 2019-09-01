@@ -1,5 +1,5 @@
+main: net.craftcrepper.proauth.bukkit.ProAuthBukkit
 name: ProAuth
-main: net.craftcrepper.proauth.bukkit.ProAuthBukkit;
 author: SAM_XPS
 load: startup
 version: B_0.1
