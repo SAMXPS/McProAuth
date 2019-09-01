@@ -1,0 +1,5 @@
+name: ProAuth
+main: net.craftcrepper.proauth.bungee.ProAuthBungee
+author: SAM_XPS
+load: startup
+version: B_0.1
