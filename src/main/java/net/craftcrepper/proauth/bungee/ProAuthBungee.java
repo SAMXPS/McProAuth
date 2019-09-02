@@ -17,7 +17,6 @@ import net.craftcrepper.proauth.database.MysqlManager;
 import net.craftcrepper.proauth.scheduler.FutureController;
 import net.craftcrepper.proauth.scheduler.FutureRunnable;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -94,7 +93,7 @@ public class ProAuthBungee extends Plugin implements Listener, FutureController{
 
 	@EventHandler
 	public void onMessage(PluginMessageEvent event){
-		if (event.getTag().equals("BungeeCord") || event.getTag().equals("HardcoreGames")){
+		if (event.getTag().equals("BungeeCord")){
 		    ByteArrayDataInput in = ByteStreams.newDataInput(event.getData());
 		    String subchannel = in.readUTF();
 		    if (subchannel.equalsIgnoreCase("AuthPlayer")){
@@ -139,22 +138,13 @@ public class ProAuthBungee extends Plugin implements Listener, FutureController{
 			}
 		});
 	}
-
-	public int getOnlinePlayers(){
-		int on = 0;
-		for (ServerInfo info : getProxy().getServers().values()){
-			if (!info.getName().equalsIgnoreCase("login"))
-				on += info.getPlayers().size();
-		}
-		return on;
-	}
 	
 	@EventHandler
 	public void onServerConnect(final ServerConnectEvent event){
 		if (authManager.isAuthenticated(event.getPlayer())){
 			return;
 		} else {
-			event.setTarget(ProxyServer.getInstance().getServerInfo("login"));
+			event.setTarget(ProxyServer.getInstance().getServerInfo(config.getString("login-server")));
 		}
 	}
 	

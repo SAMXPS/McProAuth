@@ -52,6 +52,8 @@ public class ProAuthBukkit extends JavaPlugin implements Listener, PluginMessage
 	private static ProAuthBukkit instance;
 	@Getter
 	public static String websiteAddress;
+	@Getter
+	public static boolean websiteHook;
 	protected TokenGenerator tokenGenerator;
 	protected PasswordVerifier passwordVerifier;
 	protected MysqlManager mysqlManager;
@@ -79,6 +81,7 @@ public class ProAuthBukkit extends JavaPlugin implements Listener, PluginMessage
 		this.mysqlManager = new MysqlManager(loadMysqlConfig(), this);
 
 		websiteAddress = getConfig().getString("website", "http://configure.me/");
+		websiteHook = getConfig().getBoolean("website-hook", false);
 		saveConfig();
 		
 		new BukkitRunnable() {
@@ -148,7 +151,7 @@ public class ProAuthBukkit extends JavaPlugin implements Listener, PluginMessage
 			
 			@Override
 			public void run() {
-				player.kickPlayer(ChatColor.RED + "Erro no servidor de login. Tente novamente em alguns instantes. \n\n" + ChatColor.AQUA + "[!] Caso este erro persista, entre em contato com a equipe do Servidor. \n@CraftCrepper\nbsbcraftplays@gmail.com");
+				player.kickPlayer(ChatColor.RED + "Erro no servidor de login. Tente novamente em alguns instantes.");
 			}
 		};
 		if (Bukkit.isPrimaryThread()){
@@ -172,7 +175,7 @@ public class ProAuthBukkit extends JavaPlugin implements Listener, PluginMessage
 		} catch (Exception error){
 			alert("An error occurred while loading userdata for " + event.getUniqueId() + ", error info:");
 			error.printStackTrace();
-			event.disallow(Result.KICK_OTHER, ChatColor.RED + "Erro no servidor de login. Tente novamente em alguns instantes. \n\n" + ChatColor.AQUA + "[!] Caso este erro persista, entre em contato com a equipe do Servidor. \n@CraftCrepper\nbsbcraftplays@gmail.com");
+			event.disallow(Result.KICK_OTHER, ChatColor.RED + "Erro no servidor de login. Tente novamente em alguns instantes.");
 		}
 	}
 	
@@ -205,19 +208,23 @@ public class ProAuthBukkit extends JavaPlugin implements Listener, PluginMessage
 				player.sendMessage(ChatColor.RED + "[?] Esqueceu sua senha? digite /recover para mais informaçoes.");
 			}
 		} else {
-			databaseManager.loadRegistrationRequestToken(player, new MysqlCallback<RegistrationRequestToken>() {
-				@Override
-				public void onResult(RegistrationRequestToken result, Throwable error) {
-					if (error != null){
-						kickPlayerForError(player);
-					} else if (result == null){
-						player.sendMessage(ChatColor.RED + "[!] Você ainda não é registrado no servidor. Digite /register para continuar.");
-						player.sendMessage(ChatColor.RED + "[?] Acesse " + websiteAddress + "/register.php para obter ajuda.");
-					} else {
-						sendRegistrationLink(player, result);
+			if (websiteHook){
+				databaseManager.loadRegistrationRequestToken(player, new MysqlCallback<RegistrationRequestToken>() {
+					@Override
+					public void onResult(RegistrationRequestToken result, Throwable error) {
+						if (error != null){
+							kickPlayerForError(player);
+						} else if (result == null){
+							player.sendMessage(ChatColor.RED + "[!] Você ainda não é registrado no servidor. Digite /register para continuar.");
+							player.sendMessage(ChatColor.RED + "[?] Acesse " + websiteAddress + "/register.php para obter ajuda.");
+						} else {
+							sendRegistrationLink(player, result);
+						}
 					}
-				}
-			});
+				});
+			} else {
+				player.sendMessage(ChatColor.RED + "[!] Você ainda não é registrado no servidor. Digite /register para criar sua conta.");
+			}
 		}
 	}
 	
@@ -298,7 +305,6 @@ public class ProAuthBukkit extends JavaPlugin implements Listener, PluginMessage
 
 	}
     
-
     @Override    /* Async scheduller implementation for Bukkit. */
     public void runAsync(FutureRunnable run) {
         new BukkitRunnable(){

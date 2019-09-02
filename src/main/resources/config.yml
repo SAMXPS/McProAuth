@@ -4,5 +4,23 @@ mysql:
   user: "root"
   password: ""
   database: "my_database" 
+
+# The following configuration is for BungeeCord side only 
+
+# login-server: This is the name of the login server in your BungeeCord main config.yml
+login-server: login
+
+# default-server: Where should the plugin send the player after loggin-in?
+default-server: lobby
+
+# The following configuration is for Spigot side only 
+
 # Change the configuration below so you can use website integration
+
+# Webite-hook settings
+website-hook: true
 website: "www.mywebsite.com"
+
+# Non-website settings
+require-email: false
+

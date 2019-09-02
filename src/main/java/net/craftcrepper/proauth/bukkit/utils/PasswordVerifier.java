@@ -24,6 +24,10 @@ public class PasswordVerifier {
 	public static boolean checkPassword(String plaintext, String hashed){
 		return BCrypt.checkpw(plaintext, fixCompatibility(hashed));
 	} 
+
+	public static String hashPassword(String password) {
+		return BCrypt.hashpw(password, BCrypt.gensalt());
+	}
 	
 	private static String fixCompatibility(String hash){
 		char[] arr = hash.toCharArray();

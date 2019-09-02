@@ -33,14 +33,11 @@ public class PremiumManager {
 				accounts.put(uuid, acc);
 			} catch (Exception e) {
 				if (e instanceof TooManyRequestsException){
-					event.setCancelled(true);
 					// 600 requests?? Really?
-					event.setCancelReason("Can't connect to Mojang servers right now. Try again in a few seconds.");
-				} else {
-					event.setCancelled(true);
-					event.setCancelReason("Ocorreu um erro ao carregar seus dados na API da Mojang.\nTente logar novamente.");
 				}
-				System.out.println("[ProAuth] Erro ao verificar se a conta "
+				event.setCancelled(true);
+				event.setCancelReason("Can't connect to Mojang servers right now. Try again in a few seconds.");
+				System.out.println("[McProAuth] Erro ao verificar se a conta "
 						+ event.getConnection().getName() + " possui minecraft original:");
 				e.printStackTrace();
 			}

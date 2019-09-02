@@ -9,8 +9,10 @@ import java.util.logging.Level;
 import org.bukkit.entity.Player;
 
 import net.craftcrepper.proauth.bukkit.types.UserData;
+import net.craftcrepper.proauth.bukkit.utils.PasswordVerifier;
 import net.craftcrepper.proauth.bukkit.utils.UtilUUID;
 import net.craftcrepper.proauth.database.MysqlCallback;
+import net.craftcrepper.proauth.bukkit.types.AuthPlayer;
 import net.craftcrepper.proauth.bukkit.types.RegistrationRequestToken;
 
 
@@ -21,6 +23,7 @@ public class DatabaseManager {
 		"CREATE TABLE IF NOT EXISTS `users` (   `ID` int(11) NOT NULL AUTO_INCREMENT,   `UUID` varchar(40) NOT NULL,   `NICKNAME` varchar(32) NOT NULL,   `EMAIL` varchar(256) NOT NULL,   `PASSWORD` varchar(256) NOT NULL,   `ONLINE_MODE` tinyint(1) NOT NULL,   `EMAIL_VERIFIED` tinyint(1) NOT NULL DEFAULT '1',   `AUTO_LOGIN` tinyint(1) NOT NULL DEFAULT '0',   PRIMARY KEY (`ID`),   UNIQUE KEY `UUID` (`UUID`),   UNIQUE KEY `ID` (`ID`),   UNIQUE KEY `EMAIL` (`EMAIL`) ) ENGINE=MyISAM AUTO_INCREMENT=10250 DEFAULT CHARSET=latin1;",
 		"CREATE TABLE IF NOT EXISTS `recover_request` (   `ID` int(11) NOT NULL AUTO_INCREMENT,   `UUID` varchar(36) NOT NULL,   `USED` tinyint(1) NOT NULL,   `TOKEN` varchar(32) NOT NULL,   `EXPIRE` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,   `IP_ADDRESS` varchar(45) NOT NULL,   `CREATION` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,   PRIMARY KEY (`ID`),   UNIQUE KEY `ID` (`ID`),   UNIQUE KEY `TOKEN` (`TOKEN`) ) ENGINE=InnoDB AUTO_INCREMENT=148 DEFAULT CHARSET=latin1;",
 		"CREATE TABLE IF NOT EXISTS `registration_request` (   `ID` int(11) NOT NULL AUTO_INCREMENT,   `UUID` varchar(36) NOT NULL,   `NICKNAME` varchar(32) NOT NULL,   `TOKEN` varchar(32) NOT NULL,   `EXPIRE` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,   `ONLINE_MODE` tinyint(1) NOT NULL,   PRIMARY KEY (`ID`),   UNIQUE KEY `ID` (`ID`),   UNIQUE KEY `TOKEN` (`TOKEN`) ) ENGINE=MyISAM AUTO_INCREMENT=45912 DEFAULT CHARSET=latin1; ",
+		"CREATE TABLE IF NOT EXISTS `user_access` (   `ID` bigint(20) NOT NULL AUTO_INCREMENT,   `LOGIN_TYPE` tinyint(4) NOT NULL COMMENT '0 -> SERVER, 1 -> WEB',   `UUID` varchar(36) NOT NULL,   `IP_ADDRESS` varchar(45) NOT NULL,   `LOGIN_TIME` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,   `ONLINE_TIME` int(11) DEFAULT NULL COMMENT 'Tempo online, em segundos',   PRIMARY KEY (`ID`) ) ENGINE=MyISAM AUTO_INCREMENT=109405 DEFAULT CHARSET=latin1; ",
 	};
 	
 	public void init() {
@@ -110,4 +113,14 @@ public class DatabaseManager {
 		}
 	}
 	
+	public void registerPlayer(Player player, String password, String email, MysqlCallback<Boolean> callback) {
+		try {
+			password = PasswordVerifier.hashPassword(password);
+			main.mysqlManager.executeAsync("INSERT INTO `users`(`UUID`, `NICKNAME`, `EMAIL`, `PASSWORD`, `ONLINE_MODE`, `EMAIL_VERIFIED`, `AUTO_LOGIN`) VALUES (?,?,?,?,?,?,?)", callback,
+				UtilUUID.getNoDashesUUID(player.getUniqueId()), player.getName(), email, password, main.isOnlineMode(player), 0, main.isOnlineMode(player));
+		} catch (Exception e) {
+			callback.onResult(false, e);
+		}
+	}
+
 }

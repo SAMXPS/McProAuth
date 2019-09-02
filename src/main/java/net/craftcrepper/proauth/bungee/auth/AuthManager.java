@@ -22,7 +22,7 @@ public class AuthManager {
 			public void run() {
 				for (ProxiedPlayer player : authenticatedPlayers.keySet()){
 					try{
-						if (player.getServer().getInfo().getName().equalsIgnoreCase("login"))
+						if (player.getServer().getInfo().getName().equalsIgnoreCase(ProAuthBungee.instance.getConfig().getString("login-server")))
 							sendToLobby(player);
 						if (!player.isConnected())
 							ProxyServer.getInstance().getScheduler().schedule(ProAuthBungee.instance, new Runnable() {
@@ -50,8 +50,7 @@ public class AuthManager {
 	}
 	
 	private void sendToLobby(ProxiedPlayer player){
-		player.sendMessage(new ComponentBuilder("Estamos te enviando para o lobby...").color(ChatColor.GOLD).create());
-		player.connect(ProxyServer.getInstance().getServerInfo("lobby"));
+		player.connect(ProxyServer.getInstance().getServerInfo(ProAuthBungee.instance.getConfig().getString("default-server")));
 	}
 	
 	public void update(ProxiedPlayer player){
